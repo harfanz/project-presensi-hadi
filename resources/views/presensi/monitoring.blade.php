@@ -112,6 +112,48 @@ $(function(){
     loadpresensi();
   });
 
+  $(function(){
+    $("#tanggal").datepicker({ 
+        autoclose: true, 
+        todayHighlight: true,
+        format:'yyyy-mm-dd'
+    });
+
+    // 🔹 Cek apakah ada tanggal tersimpan di localStorage
+    const savedTanggal = localStorage.getItem('tanggal_monitoring');
+    if (savedTanggal) {
+        $('#tanggal').val(savedTanggal);
+    }
+
+    function loadpresensi(){
+        var tanggal = $('#tanggal').val();
+
+        // 🔹 Simpan tanggal ke localStorage setiap kali loadpresensi dipanggil
+        localStorage.setItem('tanggal_monitoring', tanggal);
+
+        $.ajax({
+            type: 'POST',
+            url: '/getpresensi',
+            data: {
+                _token: "{{ csrf_token() }}",
+                tanggal: tanggal
+            },
+            cache: false,
+            success: function(respond){
+                $("#loadpresensi").html(respond);
+            }
+        });
+    }
+
+    $("#tanggal").change(function(e){
+        loadpresensi();
+    });
+
+    // 🔹 Panggil pertama kali saat halaman dibuka
+    loadpresensi();
+});
+
+
   loadpresensi();
 })
    
